@@ -18,7 +18,7 @@ CREATE PROCEDURE sp_withdraws(IN id INT , IN money DOUBLE)
 	DECLARE balance1 DOUBLE ;
 	SET balance1 = (SELECT c.balance FROM customers c WHERE c.id = id);
 
-	IF (balance1 >= money) THEN  
+	IF (balance1 >= money && balance1 > 0) THEN  
 	SET balance1 = balance1 - money ; 
 
 	UPDATE customers
@@ -38,10 +38,10 @@ BEGIN
 	SET deposits_balance = ( SELECT c.balance FROM customers c WHERE c.id = deposits_id);
 	SET withdraws_balance = (SELECT c.balance FROM customers c where c.id = withdraws_id);
 
-	IF (deposits_balance >= (money+money*10/100)) THEN
+	IF (deposits_balance >= (money+money*10/100) && deposits_balance > 0) THEN
 	SET deposits_balance = deposits_balance - (money+money*10/100);
     SET withdraws_balance = withdraws_balance + money;
-
+	
 	UPDATE customers
 	SET balance = deposits_balance WHERE customers.id = deposits_id;
 	UPDATE customers
@@ -54,11 +54,18 @@ BEGIN
 END IF;
 END//
 
+-- DELIMITER //
+-- CREATE PROCEDURE views()
+-- BEGIN 	
+-- SELECT 
+
+-- END //
+
 
 
 CALL sp_deposit(1,6000);
 
 CALL sp_withdraws(1,1000);
 
-CALL sp_transfers(1,2,3000);
+CALL sp_transfers(1,2,7000);
 
